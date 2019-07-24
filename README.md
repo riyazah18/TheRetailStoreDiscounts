@@ -4,8 +4,13 @@ How to run the program
 ----------------------
 Steps 
 -----
-1.Get the code from Git and import in any java IDE
-2.Open the Test.Java file and Run.
+Open a command prompt window and go to the directory where you saved the java program (Test.java). Assume it's C:\.
+
+Type 'javac Test.java' and press enter to compile your code. If there are no errors in code, the command prompt will take you to the next line (Assumption: The path variable is set).
+
+Now, type ' java Test ' to run your program.
+
+You will be able to see the result printed on the window.
 
 UML Diagrams
 ------------

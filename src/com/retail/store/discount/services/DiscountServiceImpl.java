@@ -9,7 +9,11 @@ import com.retail.store.utils.Discount;
 
 public class DiscountServiceImpl implements DiscountService {
 	
-	
+	 public static final int BillAmount = 100;
+		double nonGroceriesTotalAmount =0;
+		double groceriesTotalAmount =0;
+		double totalAmount=0;
+		double groceriesDiscount=0;	
 	
 	public double discount(Bill bill){
 		if(bill !=null){			
@@ -20,27 +24,14 @@ public class DiscountServiceImpl implements DiscountService {
 	}
 	
 	public double calculateDiscount(Bill bill){
-		double nonGroceriesTotalAmount =0;
-		double groceriesTotalAmount =0;
-		double totalAmount=0;
-		double groceriesDiscount=0;		
+		
 		// If the user is an employee of the store, he gets a 30% discount
-		if(bill.getOrder().getUser().isEmployee()){
-			for (OrderItems items : bill.getOrder().getItems()) {
-				if(!items.getProduct().isGrocery()){
-					nonGroceriesTotalAmount+=items.getProduct().getPrice() * (items.getQunatity() !=0 ? items.getQunatity():1);
-				}
-				if(items.getProduct().isGrocery()){
-					groceriesTotalAmount+=items.getProduct().getPrice() * (items.getQunatity() !=0 ? items.getQunatity():1);
-				}
-				
-				
-			}
-			totalAmount=nonGroceriesTotalAmount+groceriesTotalAmount;
+		if(bill.getOrder().getUser().isEmployee()){		
+			totalAmount=calculatedAmount(bill);
 			bill.setTotalAmount(totalAmount);
 			bill.setTotalDiscount(calculatePercentageViseDiscount(nonGroceriesTotalAmount,Discount.THIRTY_PERCENT.getValue()));
 			bill.setDiscountedAmount(bill.getTotalAmount() - bill.getTotalDiscount());
-			if(groceriesTotalAmount >=100){
+			if(groceriesTotalAmount >=BillAmount){
 				groceriesDiscount=calculateSimpleDiscount(groceriesTotalAmount);
 				return bill.getDiscountedAmount()-groceriesDiscount;
 			}
@@ -49,22 +40,12 @@ public class DiscountServiceImpl implements DiscountService {
 		}
 		
 		// If the user is an affiliate of the store, he gets a 10% discount
-		else if(bill.getOrder().getUser().isAffiliate()){
-			for (OrderItems items : bill.getOrder().getItems()) {
-				if(!items.getProduct().isGrocery()){
-					nonGroceriesTotalAmount+=items.getProduct().getPrice() * (items.getQunatity() !=0 ? items.getQunatity():1);
-				}
-				if(items.getProduct().isGrocery()){
-					groceriesTotalAmount+=items.getProduct().getPrice() * (items.getQunatity() !=0 ? items.getQunatity():1);
-				}
-				
-				
-			}
-			totalAmount=nonGroceriesTotalAmount+groceriesTotalAmount;
+		else if(bill.getOrder().getUser().isAffiliate()){			
+			totalAmount=calculatedAmount(bill);
 			bill.setTotalAmount(totalAmount);
 			bill.setTotalDiscount(calculatePercentageViseDiscount(nonGroceriesTotalAmount,Discount.TEN_PERCENT.getValue()));
 			bill.setDiscountedAmount(bill.getTotalAmount() - bill.getTotalDiscount());
-			if(groceriesTotalAmount >=100){
+			if(groceriesTotalAmount >=BillAmount){
 				groceriesDiscount=calculateSimpleDiscount(groceriesTotalAmount);
 				return bill.getDiscountedAmount()-groceriesDiscount;
 			}
@@ -77,22 +58,12 @@ public class DiscountServiceImpl implements DiscountService {
 			LocalDate currentDate = LocalDate.now();
 			LocalDate memberSince = bill.getOrder().getUser().getMemberSince();			
 			long years = java.time.temporal.ChronoUnit.YEARS.between( memberSince , currentDate );
-		    if(years >=2){
-		    	for (OrderItems items : bill.getOrder().getItems()) {
-					if(!items.getProduct().isGrocery()){
-						nonGroceriesTotalAmount+=items.getProduct().getPrice() * (items.getQunatity() !=0 ? items.getQunatity():1);
-					}
-					if(items.getProduct().isGrocery()){
-						groceriesTotalAmount+=items.getProduct().getPrice() * (items.getQunatity() !=0 ? items.getQunatity():1);
-					}
-					
-					
-				}
-				totalAmount=nonGroceriesTotalAmount+groceriesTotalAmount;
+		    if(years >=2){	    	
+		    	totalAmount=calculatedAmount(bill);
 				bill.setTotalAmount(totalAmount);
 				bill.setTotalDiscount(calculatePercentageViseDiscount(nonGroceriesTotalAmount,Discount.FIVE_PERCENT.getValue()));
 				bill.setDiscountedAmount(bill.getTotalAmount() - bill.getTotalDiscount());
-				if(groceriesTotalAmount >=100){
+				if(groceriesTotalAmount >=BillAmount){
 					groceriesDiscount=calculateSimpleDiscount(groceriesTotalAmount);
 					return bill.getDiscountedAmount()-groceriesDiscount;
 				}
@@ -102,6 +73,19 @@ public class DiscountServiceImpl implements DiscountService {
 		}
 		return 0;
 		
+	}
+
+	private double calculatedAmount(Bill bill) {		
+		for (OrderItems items : bill.getOrder().getItems()) {
+			if(!items.getProduct().isGrocery()){
+				nonGroceriesTotalAmount+=items.getProduct().getPrice() * (items.getQunatity() !=0 ? items.getQunatity():1);
+			}
+			if(items.getProduct().isGrocery()){
+				groceriesTotalAmount+=items.getProduct().getPrice() * (items.getQunatity() !=0 ? items.getQunatity():1);
+			}			
+			
+		}		
+		return nonGroceriesTotalAmount+groceriesTotalAmount;
 	}
 
 	@Override

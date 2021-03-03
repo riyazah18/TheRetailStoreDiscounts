@@ -10,6 +10,11 @@ import com.retail.store.discount.entity.User;
 import com.retail.store.discount.interfaces.DiscountService;
 import com.retail.store.discount.services.DiscountServiceImpl;
 
+/**
+ * @Description : A test class for retail store discount.
+ * @author riyaz.ahmed
+ *
+ */
 public class Test {
 
 	public static void main(String[] args) {
